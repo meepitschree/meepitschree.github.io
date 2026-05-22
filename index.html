@@ -7,11 +7,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,700;1,7..72,400;1,7..72,700&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./src/styles/main.css" />
-    <title>Portfolio — 2025</title>
+    <title>xt</title>
+    <script>
+      // Apply theme synchronously before paint to prevent a flash of the
+      // wrong theme. Mirror the logic in theme.js so the two stay in sync.
+      (function () {
+        try {
+          var theme = localStorage.getItem("theme") ?? "dark";
+          document.documentElement.dataset.theme = theme;
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <main id="pf">
@@ -19,16 +29,26 @@
       <canvas id="trail-canvas" aria-hidden="true"></canvas>
       <div class="cursor" id="cursor" aria-hidden="true"></div>
 
-      <section class="hero">
-        <div class="hero-greeting">hi, i'm</div>
-        <h1 class="hero-name">
-          <span class="cycling" id="cycling-name"></span><span class="cursor-blink" aria-hidden="true"></span>
-        </h1>
-        <nav class="hero-links">
-          <a href="#work">???</a>
-          <a href="#about">???</a>
-          <a href="#contact">???</a>
-        </nav>
+      <section class="page page-home" data-page="home">
+        <div class="hero">
+          <div class="hero-greeting">hi, i'm</div>
+          <h1 class="hero-name">
+            <span class="cycling" id="cycling-name"></span><span class="cursor-blink" aria-hidden="true"></span>
+          </h1>
+          <nav class="hero-links">
+            <!-- <a href="#/work">work</a> -->
+            <a href="#/about">about</a>
+            <!-- <a href="#/contact">say hi</a> -->
+          </nav>
+        </div>
+      </section>
+
+      <section class="page page-about" data-page="about" hidden>
+        <div class="about-content">
+          <p>i'm figuring out what to write here still.</p>
+          <p>xoxo.</p>
+          <a href="#/" class="page-back">← back</a>
+        </div>
       </section>
 
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">Dark</button>

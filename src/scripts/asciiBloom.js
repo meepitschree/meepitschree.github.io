@@ -15,12 +15,24 @@ const RAMP = " .:+*o@";
 const MASK_W_FRAC = 0.1;
 const MASK_H_FRAC = 0.1;
 
+// Scene transition timing (seconds).
+const SCENE_TRANSITION = 1.5;
+
 export function createAsciiBloom({ container, element, cursorState }) {
   let cols = 80;
   let rows = 60;
   let ambient = [];
   let masks = [];
   let t = 0;
+
+  // Scene state. `scene` is the settled scene (or the one we came from
+  // mid-transition); `targetScene` is where we're heading. While
+  // `transitionProgress < 1`, both intensities are computed and crossfaded.
+  let scene = "bloom"; // "bloom" | "hill"
+  let targetScene = "bloom";
+  let transitionProgress = 1;
+  let transitionStart = 0;
+  let onSettleCallback = null;
 
   function measureCharSize() {
     const style = getComputedStyle(element);
@@ -71,7 +83,43 @@ export function createAsciiBloom({ container, element, cursorState }) {
 
   function frame(dt) {
     t += dt;
-    element.textContent = renderFrame(t, cols, rows, ambient, cursorState, masks);
+
+    // Advance scene transition if active.
+    if (transitionProgress < 1) {
+      transitionProgress = Math.min(1, (t - transitionStart) / SCENE_TRANSITION);
+      if (transitionProgress >= 1) {
+        scene = targetScene;
+        if (onSettleCallback) onSettleCallback(scene);
+      }
+    }
+
+    element.textContent = renderFrame(
+      t,
+      cols,
+      rows,
+      ambient,
+      cursorState,
+      masks,
+      scene,
+      targetScene,
+      transitionProgress
+    );
+  }
+
+  // Trigger a crossfade to a new scene. No-op if already transitioning or
+  // already at that scene.
+  function setScene(name) {
+    if (name === targetScene && transitionProgress >= 1) return;
+    if (transitionProgress < 1) return; // ignore mid-transition for simplicity
+    scene = targetScene;
+    targetScene = name;
+    transitionProgress = 0;
+    transitionStart = t;
+  }
+
+  // Subscribe to "transition completed" — fires with the settled scene name.
+  function onSettle(cb) {
+    onSettleCallback = cb;
   }
 
   // Re-measure once the webfont has loaded; the fallback font may have
@@ -93,7 +141,14 @@ export function createAsciiBloom({ container, element, cursorState }) {
     return false;
   }
 
-  return { measure, frame, isInMask };
+  // Pixel-space hill top at a given x position. Uses the static base shape
+  // (no wind, no cursor pull) so flowers stay pinned to a stable contour.
+  function hillTopPxAt(xPx) {
+    const col = xPx / CHAR_WIDTH;
+    return staticHillTopRow(col, rows) * CHAR_HEIGHT;
+  }
+
+  return { measure, frame, isInMask, setScene, onSettle, hillTopPxAt };
 }
 
 function buildAmbient(rows, cols) {
@@ -125,7 +180,62 @@ const BLOOM_PETALS = 3;
 
 const MASK_SOFTNESS = 25; // cells over which the suppression fades back to full bloom
 
-function renderFrame(t, cols, rows, ambient, cursor, masks) {
+// Hill scene parameters.
+const HILL_TOP_FRAC_SETTLED = 0.82; // top edge sits at 82% down the viewport
+const HILL_TOP_FRAC_HIDDEN = 1.1; // pushed below the viewport when not active
+const HILL_AMPLITUDE = 5; // primary sin-wave amplitude on the top edge (cells)
+const HILL_FREQ = 0.04; // primary sin-wave frequency
+const HILL_EDGE_SOFTNESS = 1.8; // smooth-step radius around the top edge (cells)
+const HILL_CURSOR_INFLUENCE_R = 30; // cells of cursor influence on the hill ridge
+const HILL_CURSOR_PULL = 0.35; // how strongly the ridge follows the cursor's row
+const HILL_CURSOR_PULL_MAX = 6; // clamp on max ridge displacement (cells)
+
+// Back-hill (parallax layer) — sits behind the front hill and pokes out as
+// a "shading strip" where its ridge is higher than the front's. Stays still
+// (no wind, no cursor pull) so the front clearly reads as the live layer.
+const BACK_HILL_OFFSET = -6; // cells the back ridge sits above the front baseline
+// Strip intensity → glyph via RAMP " .:+*o@":
+//   0.28 → '.'   0.40 → ':'   0.50 → '+'   0.65 → '*'   0.78 → 'o'
+// The smoothstep edge fades the top through lighter glyphs automatically.
+const BACK_HILL_DENSITY = 0.2;
+
+// Per-column static shape of the hill ridge (no wind, no cursor, no presence).
+// Used both for rendering and for flower placement so they share one source.
+function hillBaseShape(col) {
+  return (
+    Math.sin(col * HILL_FREQ) * HILL_AMPLITUDE +
+    Math.sin(col * HILL_FREQ * 0.5 + 1.3) * (HILL_AMPLITUDE * 0.5)
+  );
+}
+
+// Back-hill ridge shape. Slightly different frequencies + phase so its peaks
+// land between the front hill's peaks for a parallax silhouette.
+function hillBackShape(col) {
+  return (
+    Math.sin(col * HILL_FREQ * 0.85 + 1.9) * (HILL_AMPLITUDE * 0.9) +
+    Math.sin(col * HILL_FREQ * 0.45 + 2.6) * (HILL_AMPLITUDE * 0.45)
+  );
+}
+
+function staticHillTopRow(col, rows) {
+  return rows * HILL_TOP_FRAC_SETTLED + hillBaseShape(col);
+}
+
+function smoothstep(t) {
+  return t * t * (3 - 2 * t);
+}
+
+function renderFrame(
+  t,
+  cols,
+  rows,
+  ambient,
+  cursor,
+  masks,
+  scene,
+  targetScene,
+  transitionProgress
+) {
   const centers = BLOOM_CENTERS.map((b) => ({
     col: cols * b.fx,
     row: rows * b.fy,
@@ -136,26 +246,126 @@ function renderFrame(t, cols, rows, ambient, cursor, masks) {
   const trail = cursor.trail;
   const trailFade = Math.min(1, cursor.speed / 15);
 
+  // Scene blending. Both intensities are computed per cell when in transition;
+  // otherwise only the settled scene contributes.
+  const inTransition = transitionProgress < 1;
+  const eased = smoothstep(transitionProgress);
+
+  // Per-scene "presence" (0..1). Used to fade bloom out / fade hill in, and
+  // to slide the hill's top edge in/out of the viewport.
+  let bloomPresence, hillPresence;
+  if (!inTransition) {
+    bloomPresence = scene === "bloom" ? 1 : 0;
+    hillPresence = scene === "hill" ? 1 : 0;
+  } else if (targetScene === "hill") {
+    bloomPresence = 1 - eased;
+    hillPresence = eased;
+  } else {
+    // Going to bloom
+    bloomPresence = eased;
+    hillPresence = 1 - eased;
+  }
+
+  // Top edge of hill in cell-rows. Slides up from below the viewport as
+  // hillPresence climbs from 0 to 1.
+  const hillTopBaseRow =
+    rows *
+    (HILL_TOP_FRAC_HIDDEN +
+      (HILL_TOP_FRAC_SETTLED - HILL_TOP_FRAC_HIDDEN) * hillPresence);
+
   let out = "";
   for (let r = 0; r < rows; r++) {
     let line = "";
     for (let c = 0; c < cols; c++) {
+      // Bloom intensity (existing math). Skip the loop entirely when the
+      // bloom is fully retreated to save the trig in the hill scene.
       let bloomIntensity = 0;
-      for (const ctr of centers) {
-        const v = bloomAt(c, r, ctr.col, ctr.row, t, mxCol, myRow);
-        if (v > bloomIntensity) bloomIntensity = v;
+      if (bloomPresence > 0.001) {
+        for (const ctr of centers) {
+          const v = bloomAt(c, r, ctr.col, ctr.row, t, mxCol, myRow);
+          if (v > bloomIntensity) bloomIntensity = v;
+        }
+        if (masks.length > 0) {
+          let maskFactor = 1;
+          for (let m = 0; m < masks.length; m++) {
+            const f = rectMask(c, r, masks[m]);
+            if (f < maskFactor) maskFactor = f;
+          }
+          bloomIntensity *= maskFactor;
+        }
+        bloomIntensity *= bloomPresence;
       }
 
-      // Text masks: bloom flows around hero text instead of through it.
-      // Take the strongest suppression across all masked elements.
-      if (masks.length > 0) {
-        let maskFactor = 1;
-        for (let m = 0; m < masks.length; m++) {
-          const f = rectMask(c, r, masks[m]);
-          if (f < maskFactor) maskFactor = f;
+      // Hill intensity. Static base shape (no traveling wave). Gentle
+      // per-column wind keeps edge chars rustling. Cursor gently pulls
+      // the local ridge toward its row — same interactivity flavor as
+      // the bloom's displacement on the home page.
+      let hillIntensity = 0;
+      if (hillPresence > 0.001) {
+        const baseShape = hillBaseShape(c);
+        const cellPhase = (ambient[0] ? ambient[0][c] : 0.5) * Math.PI * 2;
+        const wind =
+          Math.sin(t * 0.7 + cellPhase) * 0.25 +
+          Math.sin(t * 1.3 + c * 0.5) * 0.15;
+
+        // Cursor pull on the local ridge — radial influence around the
+        // cursor (in column-equivalent units). The y-distance is scaled
+        // by 1.7 to compensate for taller-than-wide character cells, so
+        // the influence zone looks circular on screen.
+        const restingTop = hillTopBaseRow + baseShape;
+        const cdxCol = c - mxCol;
+        const cdyRow = (myRow - restingTop) * 1.7;
+        const cDist = Math.sqrt(cdxCol * cdxCol + cdyRow * cdyRow);
+        const influence =
+          cDist < HILL_CURSOR_INFLUENCE_R
+            ? (1 - cDist / HILL_CURSOR_INFLUENCE_R) * hillPresence
+            : 0;
+        const rawPull = (myRow - restingTop) * influence * HILL_CURSOR_PULL;
+        const cursorPull = Math.max(
+          -HILL_CURSOR_PULL_MAX,
+          Math.min(HILL_CURSOR_PULL_MAX, rawPull)
+        );
+
+        const frontTopRow = hillTopBaseRow + baseShape + wind + cursorPull;
+        const belowFront = r - frontTopRow;
+
+        if (belowFront > -HILL_EDGE_SOFTNESS) {
+          // Inside the front hill — solid, uniform interior with a smooth
+          // edge at the top. No noise / no banding by design: the shading
+          // strip below is what gives the scene depth.
+          let edge;
+          if (belowFront >= HILL_EDGE_SOFTNESS) {
+            edge = 1;
+          } else {
+            const u =
+              (belowFront + HILL_EDGE_SOFTNESS) / (2 * HILL_EDGE_SOFTNESS);
+            edge = u * u * (3 - 2 * u);
+          }
+          hillIntensity = edge * hillPresence;
+        } else {
+          // Above the front ridge — render the back-hill strip wherever it
+          // pokes higher than the front. Static (no wind/cursor) so the
+          // band reads like a distant horizon rather than a second wave.
+          const backShape = hillBackShape(c);
+          const backTopRow = hillTopBaseRow + backShape + BACK_HILL_OFFSET;
+          const belowBack = r - backTopRow;
+          if (belowBack > -HILL_EDGE_SOFTNESS) {
+            let edge;
+            if (belowBack >= HILL_EDGE_SOFTNESS) {
+              edge = 1;
+            } else {
+              const u =
+                (belowBack + HILL_EDGE_SOFTNESS) / (2 * HILL_EDGE_SOFTNESS);
+              edge = u * u * (3 - 2 * u);
+            }
+            hillIntensity = edge * BACK_HILL_DENSITY * hillPresence;
+          }
         }
-        bloomIntensity *= maskFactor;
       }
+
+      // The bg is the max of the two scenes — wherever either reaches, we
+      // render the brighter glyph.
+      const bgIntensity = Math.max(bloomIntensity, hillIntensity);
 
       let cursorBloom = 0;
 
@@ -192,7 +402,7 @@ function renderFrame(t, cols, rows, ambient, cursor, masks) {
         if (ringI > cursorBloom) cursorBloom = ringI;
       }
 
-      const intensity = Math.max(bloomIntensity, cursorBloom);
+      const intensity = Math.max(bgIntensity, cursorBloom);
       line += charForIntensity(intensity);
     }
     out += line + "\n";

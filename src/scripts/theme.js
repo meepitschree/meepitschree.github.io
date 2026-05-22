@@ -8,9 +8,7 @@ const STORAGE_KEY = "theme";
 
 export function createThemeToggle({ button }) {
   const root = document.documentElement;
-  const stored = localStorage.getItem(STORAGE_KEY);
-  const initial =
-    stored ?? (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+  const initial = localStorage.getItem(STORAGE_KEY) ?? "dark";
 
   apply(initial);
 
