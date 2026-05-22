@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A portfolio at the intersection of natural systems and digital form." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./src/styles/main.css" />
+    <title>Portfolio — 2025</title>
+  </head>
+  <body>
+    <main id="pf">
+      <pre id="ascii-bg" aria-hidden="true"></pre>
+      <canvas id="trail-canvas" aria-hidden="true"></canvas>
+      <div class="cursor" id="cursor" aria-hidden="true"></div>
+
+      <section class="hero">
+        <div class="hero-greeting">hi, i'm</div>
+        <h1 class="hero-name">
+          <span class="cycling" id="cycling-name"></span><span class="cursor-blink" aria-hidden="true"></span>
+        </h1>
+        <nav class="hero-links">
+          <a href="#work">???</a>
+          <a href="#about">???</a>
+          <a href="#contact">???</a>
+        </nav>
+      </section>
+
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">Dark</button>
+    </main>
+
+    <script type="module" src="./src/scripts/main.js"></script>
+  </body>
+</html>

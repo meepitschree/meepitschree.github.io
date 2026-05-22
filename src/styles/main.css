@@ -1,0 +1,303 @@
+:root {
+  color-scheme: light;
+
+  /* Color palette */
+  --bg: #f0ebe0;
+  --ink: #1c1a14;
+  --accent: #1c1a14;
+  --accent-rgb: 28, 26, 20;
+  --accent-soft: rgba(28, 26, 20, 0.75);
+
+  --ink-60: rgba(28, 26, 20, 0.6);
+  --ink-50: rgba(28, 26, 20, 0.5);
+  --ink-45: rgba(28, 26, 20, 0.45);
+  --ink-20: rgba(28, 26, 20, 0.2);
+
+  /* Type */
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+
+  /* Layout */
+  --pad-x: 40px;
+}
+
+/* Dark palette — placeholder values, tweak freely. */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #14130f;
+  --ink: #f0ebe0;
+  --accent: #f0ebe0;
+  --accent-rgb: 240, 235, 224;
+  --accent-soft: rgba(240, 235, 224, 0.4);
+
+  --ink-60: rgba(240, 235, 224, 0.6);
+  --ink-50: rgba(240, 235, 224, 0.5);
+  --ink-45: rgba(240, 235, 224, 0.45);
+  --ink-20: rgba(240, 235, 224, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-mono);
+  background: var(--bg);
+  color: var(--ink);
+  overflow: hidden;
+  transition: background 0.25s, color 0.25s;
+}
+
+#pf {
+  position: relative;
+  height: 100vh;
+  min-height: 640px;
+  display: flex;
+  flex-direction: column;
+  cursor: none;
+}
+
+#pf * {
+  cursor: none;
+}
+
+/* ── ASCII background ─────────────────────────────────────────── */
+#ascii-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Fallbacks for symbol/dingbat coverage when Space Mono lacks a glyph. */
+  font-family: "Space Mono", ui-monospace, "Apple Symbols", "Segoe UI Symbol",
+    "Noto Sans Symbols 2", "Symbola", monospace;
+  font-variant-emoji: text;
+  font-size: 11px;
+  line-height: 11px;
+  letter-spacing: 0;
+  color: var(--accent-soft);
+  white-space: pre;
+  pointer-events: none;
+  z-index: 1;
+  user-select: none;
+  font-weight: 400;
+}
+
+#trail-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.cursor {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  z-index: 30;
+  transform: translate(-50%, -50%);
+}
+
+.cursor::before,
+.cursor::after {
+  content: "";
+  position: absolute;
+  background: var(--accent);
+  top: 50%;
+  left: 50%;
+}
+
+.cursor::before {
+  width: 12px;
+  height: 1.5px;
+  transform: translate(-50%, -50%);
+}
+
+.cursor::after {
+  width: 1.5px;
+  height: 12px;
+  transform: translate(-50%, -50%);
+}
+
+/* ── Hero ─────────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  z-index: 5;
+  flex: 1;
+  padding: 40px var(--pad-x);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.hero-greeting {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--ink-60);
+  margin-bottom: 14px;
+  letter-spacing: 0.01em;
+}
+
+.hero-name {
+  font-family: var(--font-serif);
+  font-size: 74px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.cycling {
+  color: var(--accent);
+  display: inline-block;
+  min-width: 10px;
+  font-style: italic;
+}
+
+.cursor-blink {
+  display: inline-block;
+  width: 2px;
+  height: 0.82em;
+  background: var(--accent);
+  margin-left: 3px;
+  vertical-align: -0.04em;
+  animation: blink 0.85s step-end infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.hero-links {
+  display: flex;
+  gap: 28px;
+  margin-top: 36px;
+}
+
+.hero-links a {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--ink-50);
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.hero-links a:hover {
+  color: var(--ink);
+}
+
+/* ── Click-spawned flowers ────────────────────────────────────── */
+.flower {
+  position: absolute;
+  /* Bump for bigger blooms; CSS handles size, free of monospace constraints. */
+  font-size: 28px;
+  line-height: 1;
+  color: var(--accent);
+  font-family: "Apple Symbols", "Segoe UI Symbol", "Noto Sans Symbols 2",
+    "Symbola", sans-serif;
+  font-variant-emoji: text;
+  pointer-events: none;
+  user-select: none;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  animation: flower-life 4s ease-out forwards;
+  will-change: opacity, transform;
+}
+
+@keyframes flower-life {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3) rotate(-12deg);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15) rotate(4deg);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.35) rotate(-8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flower {
+    animation: flower-life-still 4s linear forwards;
+  }
+  @keyframes flower-life-still {
+    0%,
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+}
+
+/* ── Theme toggle ─────────────────────────────────────────────── */
+.theme-toggle {
+  position: absolute;
+  bottom: 22px;
+  right: var(--pad-x);
+  z-index: 6;
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--ink-50);
+  text-transform: uppercase;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+
+.theme-toggle:hover {
+  color: var(--ink);
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  :root {
+    --pad-x: 24px;
+  }
+  .hero-name {
+    font-size: 48px;
+  }
+  .hero-links {
+    gap: 16px;
+  }
+}
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .cursor-blink {
+    animation: none;
+  }
+  body {
+    transition: none;
+  }
+}
