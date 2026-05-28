@@ -36,9 +36,9 @@
             <span class="cycling" id="cycling-name"></span><span class="cursor-blink" aria-hidden="true"></span>
           </h1>
           <nav class="hero-links">
-            <!-- <a href="#/work">work</a> -->
             <a href="#/about">about</a>
-            <!-- <a href="#/contact">say hi</a> -->
+            <a href="#/art">art</a>
+            <a href="#/play">play</a>
           </nav>
         </div>
       </section>
@@ -48,6 +48,127 @@
           <p>i'm figuring out what to write here still.</p>
           <p>xoxo.</p>
           <a href="#/" class="page-back">← back</a>
+        </div>
+      </section>
+
+      <section class="page page-art" data-page="art" hidden>
+        <div class="art-header">
+          <a href="#/" class="page-back">← back</a>
+          <p>some art picks for your viewing! (UNDER CONSTRUCTION)</p>
+          <nav class="art-tabs">
+            <button class="art-tab is-active" data-filter="all">all</button>
+            <button class="art-tab" data-filter="zines">zines</button>
+            <button class="art-tab" data-filter="digital">digital</button>
+          </nav>
+        </div>
+        <div class="art-grid" id="art-grid">
+          <!--
+            To add a piece:
+              <div class="art-item" data-category="zines">
+                <div class="art-thumb">
+                  <img src="./src/assets/your-image.jpg" alt="title" />
+                </div>
+                <p class="art-title">title</p>
+                <p class="art-meta">year</p>
+              </div>
+
+            Categories: "zines" | "digital" — add more tabs + categories freely.
+          -->
+          <div class="art-item" data-category="zines">
+            <div class="art-thumb"><span class="art-placeholder">❀︎</span></div>
+            <p class="art-title">zine title</p>
+            <p class="art-meta">2024</p>
+          </div>
+          <div class="art-item" data-category="zines">
+            <div class="art-thumb"><span class="art-placeholder">✿︎</span></div>
+            <p class="art-title">zine title</p>
+            <p class="art-meta">2024</p>
+          </div>
+          <div class="art-item" data-category="digital">
+            <div class="art-thumb"><span class="art-placeholder">❁︎</span></div>
+            <p class="art-title">digital piece</p>
+            <p class="art-meta">2025</p>
+          </div>
+          <div class="art-item" data-category="digital">
+            <div class="art-thumb"><span class="art-placeholder">❀︎</span></div>
+            <p class="art-title">digital piece</p>
+            <p class="art-meta">2024</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="page page-play" data-page="play" hidden>
+        <div class="play-header">
+          <a href="#/" class="page-back">← back</a>
+          <p>games and what not!</p>
+          <nav class="play-tabs">
+            <button class="play-tab is-active" data-filter="all">all</button>
+            <button class="play-tab" data-filter="game">games</button>
+            <button class="play-tab" data-filter="other">other</button>
+          </nav>
+        </div>
+        <div class="play-list">
+          <!--
+            To add a project, copy one of the blocks below and fill in:
+              href        — live URL
+              play-thumb  — <img src="./src/assets/your-image.jpg" alt="…" />
+                            (or leave the placeholder glyph for now)
+              play-title  — project name
+              play-desc   — 1-2 sentence description
+              play-year   — year
+              play-tag    — type, e.g. "interactive" / "game" / "tool"
+          -->
+          <a class="play-item" data-category="game" href="https://farmtotable.itch.io/memoriesos" target="_blank" rel="noopener noreferrer">
+            <div class="play-thumb">
+              <span class="play-thumb-placeholder">✿︎</span>
+            </div>
+            <div class="play-info">
+              <div class="play-meta-row">
+                <h2 class="play-title">memoriesOS</h2>
+                <span class="play-year">2025</span>
+              </div>
+              <p class="play-desc">a quickie for the Brackeys Game Jam! A point-and-click deduction game made in Godot, playable in browser. :) </p>
+              <span class="play-tag">game</span>
+            </div>
+          </a>
+          <a class="play-item" data-category="other" href="https://xtxu.space/floating/" target="_blank" rel="noopener noreferrer">
+            <div class="play-thumb">
+              <span class="play-thumb-placeholder">❁︎</span>
+            </div>
+            <div class="play-info">
+              <div class="play-meta-row">
+                <h2 class="play-title">floating</h2>
+                <span class="play-year">2021</span>
+              </div>
+              <p class="play-desc">a lil floating island to admire. Assets 3D modeled and lightly animated in Blender. Did some stylized tree studies. Noodled with three.js. </p>
+              <span class="play-tag">interactive</span>
+            </div>
+          </a>
+          <a class="play-item" data-category="game" href="https://project-trenchcoat.github.io/" target="_blank" rel="noopener noreferrer">
+            <div class="play-thumb">
+              <span class="play-thumb-placeholder">❀︎</span>
+            </div>
+            <div class="play-info">
+              <div class="play-meta-row">
+                <h2 class="play-title">ShortStacked</h2>
+                <span class="play-year">2020</span>
+              </div>
+              <p class="play-desc">a couch co-op stealth game about 2 kids in a trenchcoat for USC AGP. Wobbly physics. Pitched, directed, did art, built levels, and tbh just had a lot of fun with everyone to wrap up final year. Unreal Engine 4. </p>
+              <span class="play-tag">game</span>
+            </div>
+            <a class="play-item" data-category="game" href="https://stevenharmongames.gamejolt.io/post_hello/" target="_blank" rel="noopener noreferrer">
+            <div class="play-thumb">
+              <span class="play-thumb-placeholder">❀︎</span>
+            </div>
+            <div class="play-info">
+              <div class="play-meta-row">
+                <h2 class="play-title">Post Hello</h2>
+                <span class="play-year">2019</span>
+              </div>
+              <p class="play-desc">a short 3rd person narrative adventure from the eyes of a delivery man seeking fulfillment. It's feelsy. A small team project for USC Games. </p>
+              <span class="play-tag">game</span>
+            </div>
+          </a>
         </div>
       </section>
 

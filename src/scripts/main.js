@@ -5,9 +5,11 @@ import { createMorphTypewriter } from "./morphTypewriter.js";
 import { createThemeToggle } from "./theme.js";
 import { createFlowers } from "./flowers.js";
 import { createHillFlowers } from "./hillFlowers.js";
+import { createArtPage } from "./artPage.js";
+import { createPlayPage } from "./playPage.js";
 
 // ── Configuration ────────────────────────────────────────────────
-const NAME_CYCLE = ["XT", "christie", "cuboctave", "human"]; // "晶晶"
+const NAME_CYCLE = ["XT", "christie", "chree", "cuboctave", "human"]; // "晶晶"
 
 // ── DOM ──────────────────────────────────────────────────────────
 const container = document.getElementById("pf");
@@ -29,6 +31,12 @@ createFlowers({
   container,
   cursorState: cursor.state,
   isInBlockedArea: (x, y) => bloom.isInMask(x, y),
+});
+const artPage = createArtPage({
+  pageEl: document.querySelector('[data-page="art"]'),
+});
+const playPage = createPlayPage({
+  pageEl: document.querySelector('[data-page="play"]'),
 });
 const typer = createMorphTypewriter({
   element: cyclingNameEl,
@@ -63,9 +71,16 @@ function applyRoute() {
   if (route === "about") {
     showPage("about");
     bloom.setScene("hill");
+  } else if (route === "art") {
+    showPage("art");
+    hillFlowers.despawn();
+    bloom.setScene("art");
+  } else if (route === "play") {
+    showPage("play");
+    hillFlowers.despawn();
+    bloom.setScene("art"); // blank background — add a play scene later if wanted
   } else {
     showPage("home");
-    // Fade out hill flowers as the hill starts to retreat.
     hillFlowers.despawn();
     bloom.setScene("bloom");
   }

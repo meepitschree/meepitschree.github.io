@@ -181,7 +181,7 @@ const BLOOM_PETALS = 3;
 const MASK_SOFTNESS = 25; // cells over which the suppression fades back to full bloom
 
 // Hill scene parameters.
-const HILL_TOP_FRAC_SETTLED = 0.82; // top edge sits at 82% down the viewport
+const HILL_TOP_FRAC_SETTLED = 0.83; // top edge sits at 82% down the viewport
 const HILL_TOP_FRAC_HIDDEN = 1.1; // pushed below the viewport when not active
 const HILL_AMPLITUDE = 5; // primary sin-wave amplitude on the top edge (cells)
 const HILL_FREQ = 0.04; // primary sin-wave frequency
@@ -251,20 +251,14 @@ function renderFrame(
   const inTransition = transitionProgress < 1;
   const eased = smoothstep(transitionProgress);
 
-  // Per-scene "presence" (0..1). Used to fade bloom out / fade hill in, and
-  // to slide the hill's top edge in/out of the viewport.
-  let bloomPresence, hillPresence;
-  if (!inTransition) {
-    bloomPresence = scene === "bloom" ? 1 : 0;
-    hillPresence = scene === "hill" ? 1 : 0;
-  } else if (targetScene === "hill") {
-    bloomPresence = 1 - eased;
-    hillPresence = eased;
-  } else {
-    // Going to bloom
-    bloomPresence = eased;
-    hillPresence = 1 - eased;
-  }
+  // Per-scene "presence" (0..1). General crossfade: the outgoing scene
+  // fades from 1→0, the incoming from 0→1. Works for any pair of scenes.
+  const bloomPresence =
+    (scene === "bloom" ? 1 - eased : 0) + (targetScene === "bloom" ? eased : 0);
+  const hillPresence =
+    (scene === "hill" ? 1 - eased : 0) + (targetScene === "hill" ? eased : 0);
+  const artPresence =
+    (scene === "art" ? 1 - eased : 0) + (targetScene === "art" ? eased : 0);
 
   // Top edge of hill in cell-rows. Slides up from below the viewport as
   // hillPresence climbs from 0 to 1.
@@ -363,7 +357,11 @@ function renderFrame(
         }
       }
 
-      // The bg is the max of the two scenes — wherever either reaches, we
+      // Art scene: intentionally blank for now — add a background here later.
+      // artPresence is still computed above so the bloom fades out cleanly
+      // on transition and the scene machinery is ready when you want it.
+
+      // The bg is the max of all scenes — wherever any scene reaches, we
       // render the brighter glyph.
       const bgIntensity = Math.max(bloomIntensity, hillIntensity);
 

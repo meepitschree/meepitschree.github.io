@@ -30,19 +30,26 @@ export function createHillFlowers({ container, hillTopAt, cursorState }) {
     if (active.length > 0) return; // already planted
     const w = container.offsetWidth;
 
+    // Keep flowers at least half their max size away from each edge so
+    // none get clipped by the container boundary.
+    const xPad = SIZE_MAX_PX / 2;
+    const xRange = w - xPad * 2;
+
     for (let i = 0; i < COUNT; i++) {
-      // Spread across the width, jittered for an organic feel.
+      // Spread across the padded width, jittered for an organic feel.
       const xFrac = (i + 0.5) / COUNT + (Math.random() - 0.5) * (0.7 / COUNT);
-      const xPx = w * xFrac;
+      const xPx = xPad + xRange * Math.max(0, Math.min(1, xFrac));
       const localTopPx = hillTopAt(xPx);
 
       // Bias slightly toward shallow embeds so most flowers cluster near
       // the surface, with a few that look deeper into the slope.
+      const size = SIZE_MIN_PX + Math.random() * (SIZE_MAX_PX - SIZE_MIN_PX);
+
       const u = Math.pow(Math.random(), 1.3);
       const embedPx = EMBED_MIN_PX + u * (EMBED_MAX_PX - EMBED_MIN_PX);
-      const yPx = localTopPx + embedPx;
-
-      const size = SIZE_MIN_PX + Math.random() * (SIZE_MAX_PX - SIZE_MIN_PX);
+      // Clamp so the bottom edge of the flower stays within the container.
+      const h = container.offsetHeight;
+      const yPx = Math.min(localTopPx + embedPx, h - size / 2);
 
       const el = document.createElement("span");
       el.className = "hill-flower";
@@ -57,7 +64,11 @@ export function createHillFlowers({ container, hillTopAt, cursorState }) {
       glyph.className = "hill-flower-glyph";
       glyph.textContent =
         FLOWER_GLYPHS[Math.floor(Math.random() * FLOWER_GLYPHS.length)];
-      glyph.style.animationDelay = -(Math.random() * 4) + "s";
+      // Randomise spin speed (6–14 s) and starting phase so each flower
+      // is at a different point in its rotation.
+      const spinDuration = 6 + Math.random() * 8;
+      glyph.style.animationDuration = spinDuration + "s";
+      glyph.style.animationDelay = -(Math.random() * spinDuration) + "s";
       el.appendChild(glyph);
 
       const item = { el, x: xPx, y: yPx, leanX: 0, leanY: 0, tilt: 0 };
