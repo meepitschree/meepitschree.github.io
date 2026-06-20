@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="A portfolio at the intersection of natural systems and digital form." />
+    <meta name="description" content="my portfolio" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -26,8 +26,6 @@
   <body>
     <main id="pf">
       <pre id="ascii-bg" aria-hidden="true"></pre>
-      <canvas id="trail-canvas" aria-hidden="true"></canvas>
-      <div class="cursor" id="cursor" aria-hidden="true"></div>
 
       <section class="page page-home" data-page="home">
         <div class="hero">
@@ -74,10 +72,12 @@
 
             Categories: "zines" | "digital" — add more tabs + categories freely.
           -->
-          <div class="art-item" data-category="zines">
-            <div class="art-thumb"><span class="art-placeholder">❀︎</span></div>
-            <p class="art-title">zine title</p>
-            <p class="art-meta">2024</p>
+          <div class="art-item" data-category="zines" data-pages='["./src/assets/zine_camera/Camera_Zine_0.PNG","./src/assets/zine_camera/Camera_Zine_1.PNG","./src/assets/zine_camera/Camera_Zine_2.PNG","./src/assets/zine_camera/Camera_Zine_3.PNG","./src/assets/zine_camera/Camera_Zine_4.PNG","./src/assets/zine_camera/Camera_Zine_5.PNG","./src/assets/zine_camera/Camera_Zine_6.PNG","./src/assets/zine_camera/Camera_Zine_7.PNG"]'>
+            <div class="art-thumb">
+              <img src="./src/assets/thumb_zine_camera.png" alt="XT's First Camera! (& Zine!)" />
+            </div>
+            <p class="art-title">XT's First Camera! (& Zine!)</p>
+            <p class="art-meta">2026</p>
           </div>
           <div class="art-item" data-category="zines">
             <div class="art-thumb"><span class="art-placeholder">✿︎</span></div>
@@ -133,7 +133,7 @@
           </a>
           <a class="play-item" data-category="other" href="https://xtxu.space/floating/" target="_blank" rel="noopener noreferrer">
             <div class="play-thumb">
-              <span class="play-thumb-placeholder">❁︎</span>
+              <img src="./src/assets/thumb_floating.png" alt="floating" />
             </div>
             <div class="play-info">
               <div class="play-meta-row">
@@ -146,7 +146,7 @@
           </a>
           <a class="play-item" data-category="game" href="https://project-trenchcoat.github.io/" target="_blank" rel="noopener noreferrer">
             <div class="play-thumb">
-              <span class="play-thumb-placeholder">❀︎</span>
+              <img src="./src/assets/thumb_shortstacked.png" alt="ShortStacked" />
             </div>
             <div class="play-info">
               <div class="play-meta-row">
@@ -156,7 +156,8 @@
               <p class="play-desc">a couch co-op stealth game about 2 kids in a trenchcoat for USC AGP. Wobbly physics. Pitched, directed, did art, built levels, and tbh just had a lot of fun with everyone to wrap up final year. Unreal Engine 4. </p>
               <span class="play-tag">game</span>
             </div>
-            <a class="play-item" data-category="game" href="https://stevenharmongames.gamejolt.io/post_hello/" target="_blank" rel="noopener noreferrer">
+          </a>
+          <a class="play-item" data-category="game" href="https://stevenharmongames.gamejolt.io/post_hello/" target="_blank" rel="noopener noreferrer">
             <div class="play-thumb">
               <span class="play-thumb-placeholder">❀︎</span>
             </div>
@@ -173,6 +174,23 @@
       </section>
 
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">Dark</button>
+
+      <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+        <button class="lightbox-close" id="lightbox-close">close ×</button>
+        <div class="lightbox-content">
+          <div class="lightbox-spread" id="lightbox-spread">
+            <img class="lightbox-page" id="lightbox-page-a" src="" alt="" />
+            <img class="lightbox-page" id="lightbox-page-b" src="" alt="" hidden />
+          </div>
+          <div class="lightbox-zone lightbox-zone--prev" id="lz-prev">
+            <span class="lightbox-arrow">←</span>
+          </div>
+          <div class="lightbox-zone lightbox-zone--next" id="lz-next">
+            <span class="lightbox-arrow">→</span>
+          </div>
+        </div>
+        <span class="lightbox-counter" id="lightbox-counter"></span>
+      </div>
     </main>
 
     <script type="module" src="./src/scripts/main.js"></script>

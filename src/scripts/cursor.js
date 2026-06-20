@@ -5,7 +5,7 @@
 
 const RIPPLE_DURATION = 1.0; // seconds — how long each click ripple lives
 
-export function createCursor({ container, element }) {
+export function createCursor({ container }) {
   const state = {
     x: container.offsetWidth * 0.7,
     y: container.offsetHeight * 0.4,
@@ -44,15 +44,13 @@ export function createCursor({ container, element }) {
   function update() {
     state.x += (mx - state.x) * 0.16;
     state.y += (my - state.y) * 0.16;
-    element.style.left = state.x + "px";
-    element.style.top = state.y + "px";
 
     state.speed *= 0.92;
     if (performance.now() - lastMoveTime > 100) {
       state.speed = Math.max(state.speed - 0.5, 0);
     }
 
-    state.trail.push({ x: state.x, y: state.y });
+    state.trail.push({ x: mx, y: my });
     while (state.trail.length > TRAIL_LEN) state.trail.shift();
 
     const now = performance.now() / 1000;

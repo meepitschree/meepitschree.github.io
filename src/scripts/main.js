@@ -1,6 +1,5 @@
 import { createAsciiBloom } from "./asciiBloom.js";
 import { createCursor } from "./cursor.js";
-import { createTrailCanvas } from "./trailCanvas.js";
 import { createMorphTypewriter } from "./morphTypewriter.js";
 import { createThemeToggle } from "./theme.js";
 import { createFlowers } from "./flowers.js";
@@ -14,14 +13,11 @@ const NAME_CYCLE = ["XT", "christie", "chree", "cuboctave", "human"]; // "晶晶
 // ── DOM ──────────────────────────────────────────────────────────
 const container = document.getElementById("pf");
 const asciiEl = document.getElementById("ascii-bg");
-const cursorEl = document.getElementById("cursor");
-const trailCanvas = document.getElementById("trail-canvas");
 const cyclingNameEl = document.getElementById("cycling-name");
 const themeToggleEl = document.getElementById("theme-toggle");
 
 // ── Initialize ───────────────────────────────────────────────────
-const cursor = createCursor({ container, element: cursorEl });
-const trail = createTrailCanvas({ canvas: trailCanvas, cursorState: cursor.state });
+const cursor = createCursor({ container });
 const bloom = createAsciiBloom({
   container,
   element: asciiEl,
@@ -95,7 +91,6 @@ window.addEventListener("hashchange", applyRoute);
 
 // ── Resize handling ──────────────────────────────────────────────
 function handleResize() {
-  trail.resize(container.offsetWidth, container.offsetHeight);
   bloom.measure();
 }
 handleResize();
@@ -108,7 +103,6 @@ const FRAME_DT = 0.055; // ascii time step
 
 function frame() {
   cursor.update();
-  trail.draw();
   bloom.frame(FRAME_DT);
   hillFlowers.update();
   requestAnimationFrame(frame);
