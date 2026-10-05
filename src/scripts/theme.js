@@ -20,7 +20,7 @@ export function createThemeToggle({ button }) {
 
   function apply(theme) {
     root.dataset.theme = theme;
-    button.textContent = theme === "dark" ? "Light" : "Dark";
+    button.textContent = theme === "dark" ? "light" : "dark";
     window.dispatchEvent(new CustomEvent("themechange", { detail: { theme } }));
   }
 }

@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,700;1,7..72,400;1,7..72,700&family=Space+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./src/styles/main.css" />
@@ -45,13 +45,13 @@
         <div class="about-content">
           <p>i'm figuring out what to write here still.</p>
           <p>xoxo.</p>
-          <a href="#/" class="page-back">← back</a>
+          <a href="#/" class="page-back">back</a>
         </div>
       </section>
 
       <section class="page page-art" data-page="art" hidden>
         <div class="art-header">
-          <a href="#/" class="page-back">← back</a>
+          <a href="#/" class="page-back">back</a>
           <p>some art picks for your viewing! (UNDER CONSTRUCTION)</p>
           <nav class="art-tabs">
             <button class="art-tab is-active" data-filter="all">all</button>
@@ -99,7 +99,7 @@
 
       <section class="page page-play" data-page="play" hidden>
         <div class="play-header">
-          <a href="#/" class="page-back">← back</a>
+          <a href="#/" class="page-back">back</a>
           <p>games and what not!</p>
           <nav class="play-tabs">
             <button class="play-tab is-active" data-filter="all">all</button>
@@ -120,7 +120,7 @@
           -->
           <a class="play-item" data-category="game" href="https://farmtotable.itch.io/memoriesos" target="_blank" rel="noopener noreferrer">
             <div class="play-thumb">
-              <span class="play-thumb-placeholder">✿︎</span>
+              <img src="./src/assets/thumb_memoriesOS.PNG" alt="memoriesOS" />
             </div>
             <div class="play-info">
               <div class="play-meta-row">
@@ -159,7 +159,7 @@
           </a>
           <a class="play-item" data-category="game" href="https://stevenharmongames.gamejolt.io/post_hello/" target="_blank" rel="noopener noreferrer">
             <div class="play-thumb">
-              <span class="play-thumb-placeholder">❀︎</span>
+              <img src="./src/assets/thumb_posthello.png" alt="Post Hello" />
             </div>
             <div class="play-info">
               <div class="play-meta-row">
@@ -173,20 +173,20 @@
         </div>
       </section>
 
-      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">Dark</button>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">dark</button>
 
       <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
-        <button class="lightbox-close" id="lightbox-close">close ×</button>
+        <button class="lightbox-close" id="lightbox-close">close</button>
         <div class="lightbox-content">
           <div class="lightbox-spread" id="lightbox-spread">
             <img class="lightbox-page" id="lightbox-page-a" src="" alt="" />
             <img class="lightbox-page" id="lightbox-page-b" src="" alt="" hidden />
           </div>
           <div class="lightbox-zone lightbox-zone--prev" id="lz-prev">
-            <span class="lightbox-arrow">←</span>
+            <span class="lightbox-arrow">&lt;&lt;</span>
           </div>
           <div class="lightbox-zone lightbox-zone--next" id="lz-next">
-            <span class="lightbox-arrow">→</span>
+            <span class="lightbox-arrow">&gt;&gt;</span>
           </div>
         </div>
         <span class="lightbox-counter" id="lightbox-counter"></span>

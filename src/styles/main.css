@@ -13,8 +13,10 @@
   --ink-45: rgba(28, 26, 20, 0.45);
   --ink-20: rgba(28, 26, 20, 0.2);
 
-  --font-display: "Literata", Georgia, serif;
-  --font-mono: "Space Mono", ui-monospace, monospace;
+  /* Mid-90s web page: default Times, with Courier for small details.
+     (Space Mono is still loaded, for the ASCII background.) */
+  --font-display: "Times New Roman", Times, serif;
+  --font-mono: "Courier New", Courier, monospace;
 
   /* Layout */
   --pad-x: 40px;
@@ -47,8 +49,11 @@ body {
   height: 100%;
 }
 
+/* Type sizes: the home page is 20/52/18px; everything else is 16px text,
+   18px project titles, and 14px Courier for dates and tags. No bold. */
 body {
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
+  font-size: 16px;
   background: var(--bg);
   color: var(--ink);
   overflow: hidden;
@@ -131,20 +136,16 @@ body {
 }
 
 .hero-greeting {
-  font-family: var(--font-display);
-  font-size: 16px;
-  font-style: italic;
-  color: var(--ink-60);
+  font-size: 20px;
+  color: var(--ink);
   margin-bottom: 14px;
   letter-spacing: 0.01em;
 }
 
 .hero-name {
-  font-family: var(--font-display);
-  font-size: 74px;
-  font-weight: 700;
+  font-size: 52px;
+  font-weight: normal;
   line-height: 1;
-  letter-spacing: -0.02em;
   color: var(--ink);
 }
 
@@ -152,7 +153,6 @@ body {
   color: var(--accent);
   display: inline-block;
   min-width: 10px;
-  font-style: italic;
 }
 
 .cursor-blink {
@@ -177,23 +177,49 @@ body {
 
 .hero-links {
   display: flex;
-  gap: 28px;
+  gap: 14px;
   margin-top: 36px;
 }
 
+/* Plain underlined links, wrapped as [about] [art] [play]. */
 .hero-links a {
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  color: var(--ink-50);
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: color 0.2s;
-  padding: 10px 14px;
-  margin: -10px -14px;
+  font-size: 18px;
+  color: var(--ink);
+  text-decoration: underline;
+  padding: 10px 14px; /* bigger click area… */
+  margin: -10px -14px; /* …without changing the layout */
 }
 
-.hero-links a:hover {
-  color: var(--ink);
+/* [brackets] around links and buttons, and the << on back links.
+   inline-block keeps them out of the underline. */
+.hero-links a::before,
+.hero-links a::after,
+.theme-toggle::before,
+.theme-toggle::after,
+.lightbox-close::before,
+.lightbox-close::after,
+.page-back::before {
+  display: inline-block;
+}
+
+.hero-links a::before,
+.theme-toggle::before,
+.lightbox-close::before {
+  content: "[";
+}
+
+.hero-links a::after,
+.theme-toggle::after,
+.lightbox-close::after {
+  content: "]";
+}
+
+/* The old red flash while a link is being clicked. */
+.hero-links a:active,
+.page-back:active,
+.theme-toggle:active,
+.lightbox-close:active {
+  color: #ee0000;
 }
 
 /* ── Art page ─────────────────────────────────────────────────── */
@@ -215,45 +241,24 @@ body {
 .art-tabs,
 .play-tabs {
   display: flex;
-  gap: 28px;
+  gap: 14px;
 }
 
 .art-tab,
 .play-tab {
   background: none;
   border: none;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--ink-50);
-  padding: 4px 0 6px;
-  position: relative;
-  transition: color 0.2s;
-}
-
-.art-tab::after,
-.play-tab::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: var(--ink);
-  transition: width 0.2s;
-}
-
-.art-tab.is-active,
-.art-tab:hover,
-.play-tab.is-active,
-.play-tab:hover {
+  font-family: var(--font-display);
+  font-size: 16px;
   color: var(--ink);
+  text-decoration: underline;
+  padding: 4px 0 6px;
 }
 
-.art-tab.is-active::after,
-.play-tab.is-active::after {
-  width: 100%;
+/* The selected tab is plain text, like a link to the page you're on. */
+.art-tab.is-active,
+.play-tab.is-active {
+  text-decoration: none;
 }
 
 /* Scrollable grid */
@@ -407,8 +412,7 @@ body {
 }
 
 .lightbox-arrow {
-  font-family: var(--font-mono);
-  font-size: 20px;
+  font-size: 24px;
   color: #fff;
   opacity: 0;
   transition: opacity 0.2s;
@@ -427,18 +431,12 @@ body {
   right: 24px;
   background: none;
   border: none;
-  color: #fff;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
+  color: #fff; /* the reader is always dark, in both themes */
+  font-family: var(--font-display);
+  font-size: 16px;
+  text-decoration: underline;
   cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 0.2s;
   z-index: 1;
-}
-
-.lightbox-close:hover {
-  opacity: 1;
 }
 
 .lightbox-counter {
@@ -447,23 +445,20 @@ body {
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
   white-space: nowrap;
   pointer-events: none;
 }
 
 .art-title {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-size: 16px;
   color: var(--ink);
 }
 
 .art-meta {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 14px;
   color: var(--ink-50);
 }
 
@@ -475,10 +470,8 @@ body {
 .about-content {
   max-width: 540px;
   margin: 12vh auto 0;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 20px;
-  line-height: 1.7;
+  font-size: 16px;
+  line-height: 1.5;
   color: var(--ink);
   text-align: left;
 }
@@ -487,21 +480,19 @@ body {
   margin-bottom: 1em;
 }
 
+/* << back */
 .page-back {
   display: inline-block;
   margin-top: 32px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  color: var(--ink-50);
-  text-transform: uppercase;
-  text-decoration: none;
-  font-style: normal;
-  transition: color 0.2s;
+  font-size: 16px;
+  color: var(--ink);
+  text-decoration: underline;
 }
 
-.page-back:hover {
-  color: var(--ink);
+.page-back::before {
+  content: "<<";
+  content: "<<" / ""; /* screen readers skip it and just say "back" */
+  margin-right: 0.3em;
 }
 
 /* ── Hill-scene flowers (atmospheric, varied sizes) ───────────── */
@@ -723,33 +714,29 @@ body {
 }
 
 .play-title {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 400;
+  font-size: 18px;
+  font-weight: normal;
   line-height: 1.2;
   color: var(--ink);
+  text-decoration: underline;
 }
 
 .play-year {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 14px;
   color: var(--ink-45);
   flex-shrink: 0;
 }
 
 .play-desc {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--ink-60);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
 }
 
 .play-tag {
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 14px;
   color: var(--ink-45);
 }
 
@@ -759,19 +746,14 @@ body {
   bottom: 22px;
   right: var(--pad-x);
   z-index: 6;
+  /* [light] / [dark] — plain text, like the nav links. */
   background: none;
   border: none;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  color: var(--ink-50);
-  text-transform: uppercase;
-  padding: 4px 8px;
-  transition: color 0.2s;
-}
-
-.theme-toggle:hover {
+  font-family: var(--font-display);
+  font-size: 16px;
   color: var(--ink);
+  text-decoration: underline;
+  padding: 4px 8px;
 }
 
 /* ── Responsive ───────────────────────────────────────────────── */
@@ -780,10 +762,7 @@ body {
     --pad-x: 24px;
   }
   .hero-name {
-    font-size: 48px;
-  }
-  .hero-links {
-    gap: 16px;
+    font-size: 40px;
   }
 }
 

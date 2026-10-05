@@ -45,7 +45,7 @@ export function createArtPage({ pageEl }) {
     zoneNext.classList.toggle("is-disabled", false);
 
     const label = isFirst ? "cover" : isLast ? "back" : `${i * 2 - 1}–${i * 2}`;
-    counter.textContent = isLast ? `${label}  ·  ← to go back` : `${label}`;
+    counter.textContent = isLast ? `${label}  ·  << to go back` : `${label}`;
   }
 
   function open(pages) {
