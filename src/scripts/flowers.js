@@ -1,7 +1,7 @@
 /**
  * Spawns absolutely-positioned flower glyphs on click. Each flower is a
  * DOM <span> with a CSS fade animation; it self-removes when the
- * animation ends. Decoupled from the ASCII bloom so the glyph can use
+ * animation ends. Decoupled from the ASCII background so the glyph can use
  * any font size or family.
  */
 

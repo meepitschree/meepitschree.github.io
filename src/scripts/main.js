@@ -1,4 +1,4 @@
-import { createAsciiBloom } from "./asciiBloom.js";
+import { createAsciiBackground } from "./asciiBackground.js";
 import { createCursor } from "./cursor.js";
 import { createMorphTypewriter } from "./morphTypewriter.js";
 import { createThemeToggle } from "./theme.js";
@@ -15,10 +15,11 @@ const container = document.getElementById("pf");
 const asciiEl = document.getElementById("ascii-bg");
 const cyclingNameEl = document.getElementById("cycling-name");
 const themeToggleEl = document.getElementById("theme-toggle");
+const heroTextEl = document.querySelector(".hero-text");
 
 // ── Initialize ───────────────────────────────────────────────────
 const cursor = createCursor({ container });
-const bloom = createAsciiBloom({
+const background = createAsciiBackground({
   container,
   element: asciiEl,
   cursorState: cursor.state,
@@ -26,7 +27,14 @@ const bloom = createAsciiBloom({
 createFlowers({
   container,
   cursorState: cursor.state,
-  isInBlockedArea: (x, y) => bloom.isInMask(x, y),
+  // No flowers over the home page's text.
+  isInBlockedArea: (x, y) => {
+    const box = heroTextEl.getBoundingClientRect();
+    const origin = container.getBoundingClientRect();
+    const fx = x + origin.left;
+    const fy = y + origin.top;
+    return fx >= box.left && fx <= box.right && fy >= box.top && fy <= box.bottom;
+  },
 });
 const artPage = createArtPage({
   pageEl: document.querySelector('[data-page="art"]'),
@@ -41,7 +49,7 @@ const typer = createMorphTypewriter({
 createThemeToggle({ button: themeToggleEl });
 const hillFlowers = createHillFlowers({
   container,
-  hillTopAt: (xPx) => bloom.hillTopPxAt(xPx),
+  hillTopAt: (xPx) => background.hillTopPxAt(xPx),
   cursorState: cursor.state,
 });
 
@@ -68,26 +76,26 @@ function applyRoute() {
   if (route !== "play") playPage.hide(); // stops the desktop clock
   if (route === "about") {
     showPage("about");
-    bloom.setScene("hill");
+    background.setScene("hill");
   } else if (route === "art") {
     showPage("art");
     artPage.show();
     hillFlowers.despawn();
-    bloom.setScene("art");
+    background.setScene("plain");
   } else if (route === "play") {
     showPage("play");
     playPage.show();
     hillFlowers.despawn();
-    bloom.setScene("art"); // blank background — add a play scene later if wanted
+    background.setScene("plain");
   } else {
     showPage("home");
     hillFlowers.despawn();
-    bloom.setScene("bloom");
+    background.setScene("plain");
   }
 }
 
 // Spawn hill flowers once the hill transition has settled.
-bloom.onSettle((scene) => {
+background.onSettle((scene) => {
   if (scene === "hill") hillFlowers.spawn();
 });
 
@@ -95,7 +103,7 @@ window.addEventListener("hashchange", applyRoute);
 
 // ── Resize handling ──────────────────────────────────────────────
 function handleResize() {
-  bloom.measure();
+  background.measure();
 }
 handleResize();
 
@@ -107,7 +115,7 @@ const FRAME_DT = 0.055; // ascii time step
 
 function frame() {
   cursor.update();
-  bloom.frame(FRAME_DT);
+  background.frame(FRAME_DT);
   hillFlowers.update();
   requestAnimationFrame(frame);
 }

@@ -1,6 +1,6 @@
 /**
  * Tracks the cursor position, smooths it, measures speed, and keeps
- * a recent history (trail) for the ascii bloom to follow.
+ * a recent history (trail) for the ASCII background to follow.
  */
 
 const RIPPLE_DURATION = 1.0; // seconds — how long each click ripple lives
