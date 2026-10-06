@@ -64,11 +64,13 @@ function showPage(name) {
 
 function applyRoute() {
   const route = currentRoute();
+  if (route !== "art") artPage.hide(); // pauses the TV when you leave
   if (route === "about") {
     showPage("about");
     bloom.setScene("hill");
   } else if (route === "art") {
     showPage("art");
+    artPage.show();
     hillFlowers.despawn();
     bloom.setScene("art");
   } else if (route === "play") {

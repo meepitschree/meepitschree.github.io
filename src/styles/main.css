@@ -18,10 +18,8 @@
   --font-display: "Times New Roman", Times, serif;
   --font-mono: "Courier New", Courier, monospace;
 
-  /* Links (nav, back, tabs, project titles, theme toggle). The reader's
-     close button sits on a dark overlay in both themes, so it has its own. */
+  /* Links (nav, back, tabs, buttons, project titles, channel guide). */
   --link: var(--ink);
-  --link-on-dark: #fff;
 
   /* Layout */
   --pad-x: 40px;
@@ -202,21 +200,25 @@ button {
 .hero-links a::after,
 .theme-toggle::before,
 .theme-toggle::after,
-.lightbox-close::before,
-.lightbox-close::after,
+.tv-button::before,
+.tv-button::after,
+.channel-link::before,
+.channel-link::after,
 .page-back::before {
   display: inline-block;
 }
 
 .hero-links a::before,
 .theme-toggle::before,
-.lightbox-close::before {
+.tv-button::before,
+.channel-link::before {
   content: "[";
 }
 
 .hero-links a::after,
 .theme-toggle::after,
-.lightbox-close::after {
+.tv-button::after,
+.channel-link::after {
   content: "]";
 }
 
@@ -224,249 +226,306 @@ button {
 .hero-links a:active,
 .page-back:active,
 .theme-toggle:active,
-.lightbox-close:active {
+.tv-button:active,
+.channel-link:active {
   color: #ee0000;
 }
 
 /* ── Art page ─────────────────────────────────────────────────── */
+/* An ASCII TV of video pieces with a channel guide beside it, and the
+   zine below. (src/scripts/artPage.js, artTv.js, zineBooklet.js) */
 .page-art {
-  overflow: hidden;
-  align-items: center; /* center content column horizontally */
+  overflow-y: auto; /* the zine sits below the TV, so this page scrolls */
+  scrollbar-width: none;
+  align-items: center;
+}
+
+.page-art::-webkit-scrollbar {
+  display: none;
 }
 
 .art-header {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding-bottom: 24px;
-  flex-shrink: 0;
   width: 100%;
-  max-width: 860px;
+  max-width: 1000px;
+  flex-shrink: 0;
 }
 
-.art-tabs,
-.play-tabs {
+.art-body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 72px;
+  padding: 32px 0 80px; /* bottom: room above the theme toggle */
+  flex-shrink: 0;
+}
+
+/* TV with the channel guide beside it (stacks on narrow screens).
+   Full width, so the guide only wraps below when there's truly no room. */
+.art-stage {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 48px 56px;
+}
+
+/* For screen readers only (announces channel changes). */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── TV ── */
+.tv-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.tv {
+  position: relative;
+  cursor: pointer;
+}
+
+.tv-pre {
+  width: max-content;
+  font-family: "Space Mono", ui-monospace, monospace;
+  font-size: clamp(8px, 0.95vw, 13px);
+  line-height: 1;
+  white-space: pre;
+  user-select: none;
+}
+
+/* Nudges a TV character half a column right, so it sits centred under
+   an even-width shape like a knob. (1ch = one column in a monospace font.) */
+.tv-half {
+  position: relative;
+  left: 0.5ch;
+}
+
+/* The video, laid over the ASCII screen. Hidden during static. */
+.tv-screen {
+  position: absolute;
+  overflow: hidden;
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.tv-screen.is-on {
+  opacity: 1;
+}
+
+/* faint scanlines (no vignette) */
+.tv-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.12) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+.tv-media,
+.tv-media > * {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* "CH 03" (top right) after changing channels; "|| PAUSE" (top left). */
+.tv-osd {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  z-index: 1;
+  font: 14px "Space Mono", ui-monospace, monospace;
+  color: #fff;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
+}
+
+.tv-osd--paused {
+  right: auto;
+  left: 12px;
+}
+
+.tv-osd[hidden] {
+  display: none;
+}
+
+/* [<< ch] [pause] [ch >>] */
+.tv-controls {
   display: flex;
   gap: 14px;
 }
 
-.art-tab,
-.play-tab {
+.tv-button {
   background: none;
   border: none;
   font-family: var(--font-display);
   font-size: 16px;
   color: var(--link);
   text-decoration: underline;
-  padding: 4px 0 6px;
+  padding: 2px 0;
 }
 
-/* The selected tab is plain text, like a link to the page you're on. */
-.art-tab.is-active,
-.play-tab.is-active {
-  color: var(--ink);
+/* e.g. [pause] on a still-image channel */
+.tv-button:disabled {
+  opacity: 0.35;
   text-decoration: none;
+  cursor: default;
 }
 
-/* Scrollable grid */
-.art-grid {
-  flex: 1;
-  overflow-y: auto;
-  width: 100%;
-  max-width: 860px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 24px 20px;
-  padding-bottom: 60px; /* room above theme toggle */
-  align-content: start;
+/* ── Channel guide ── */
+.channels {
+  width: min(340px, 100%);
 }
 
-.art-grid {
-  scrollbar-width: none; /* Firefox */
-}
-.art-grid::-webkit-scrollbar {
-  display: none; /* Chrome / Safari */
+.channels-label {
+  margin-bottom: 14px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--ink-50);
 }
 
-.art-item {
+.channel-list {
+  list-style: none;
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+/* 01  title ········· year */
+.channel-tune {
+  all: unset;
+  width: 100%;
+  display: flex;
+  align-items: baseline;
   gap: 8px;
   cursor: pointer;
 }
 
-.art-item[hidden] {
-  display: none;
+.channel-tune:focus-visible {
+  outline: 1px dotted var(--ink);
+  outline-offset: 3px;
 }
 
-/* Thumbnail — portrait by default (suits zines).
-   Add class="art-thumb art-thumb--landscape" for 16:9 pieces. */
-.art-thumb {
-  position: relative;
-  aspect-ratio: 2 / 3;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.art-thumb--landscape {
-  aspect-ratio: 16 / 9;
-}
-
-.art-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  opacity: 0.55;
-  transition: opacity 0.3s ease;
-}
-
-.art-item:hover .art-thumb img {
-  opacity: 1;
-}
-
-.art-thumb-label {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.12em;
-  color: var(--ink);
-  opacity: 1;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-.art-item:hover .art-thumb-label {
-  opacity: 0;
-}
-
-.art-placeholder {
-  font-size: 28px;
-  color: var(--ink-45);
-  font-family: "Apple Symbols", "Segoe UI Symbol", "Noto Sans Symbols 2",
-    "Symbola", sans-serif;
-  font-variant-emoji: text;
-}
-
-/* ── Lightbox ─────────────────────────────────────────────────── */
-.lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.85);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
-}
-
-.lightbox.is-open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.lightbox-content {
-  position: relative;
-  display: flex;
-}
-
-.lightbox-spread {
-  display: flex;
-  gap: 3px;
-  align-items: center;
-}
-
-.lightbox-page {
-  max-height: 88vh;
-  max-width: 43vw;
-  object-fit: contain;
-  display: block;
-  user-select: none;
-}
-
-.lightbox-spread[data-solo] .lightbox-page {
-  max-width: min(80vw, 520px);
-}
-
-.lightbox-page[hidden] {
-  display: none;
-}
-
-.lightbox-zone {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 50%;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.lightbox-zone--prev { left: 0; justify-content: flex-start; }
-.lightbox-zone--next { right: 0; justify-content: flex-end; }
-
-.lightbox-zone.is-disabled {
-  pointer-events: none;
-}
-
-.lightbox-arrow {
-  font-size: 24px;
-  color: #fff;
-  opacity: 0;
-  transition: opacity 0.2s;
-  padding: 0 14px;
-  pointer-events: none;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9);
-}
-
-.lightbox-zone:hover .lightbox-arrow {
-  opacity: 0.9;
-}
-
-.lightbox-close {
-  position: absolute;
-  top: 20px;
-  right: 24px;
-  background: none;
-  border: none;
-  color: var(--link-on-dark);
-  font-family: var(--font-display);
-  font-size: 16px;
-  text-decoration: underline;
-  cursor: pointer;
-  z-index: 1;
-}
-
-.lightbox-counter {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-mono);
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.art-title {
-  font-size: 16px;
-  color: var(--ink);
-}
-
-.art-meta {
+.channel-no,
+.channel-year {
   font-family: var(--font-mono);
   font-size: 14px;
   color: var(--ink-50);
+}
+
+.channel-title {
+  color: var(--link);
+  text-decoration: underline;
+}
+
+.channel-leader {
+  flex: 1;
+  border-bottom: 1px dotted var(--ink-50);
+  transform: translateY(-0.3em);
+}
+
+/* The channel that's on: plain title, details shown. */
+.channel.is-current .channel-no {
+  color: var(--ink);
+}
+
+.channel.is-current .channel-title {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.channel-details {
+  padding: 6px 0 4px 25px; /* line up under the title */
+  line-height: 1.5;
+}
+
+.channel-details[hidden] {
+  display: none;
+}
+
+.channel-link {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--link);
+}
+
+/* ── Zine booklet ── */
+.book {
+  /* Zine pages are 825 × 1275. */
+  --page-h: clamp(220px, 40vh, 380px);
+  --page-w: calc(var(--page-h) * 825 / 1275);
+  /* room for an open spread, so opening it doesn't shift anything */
+  width: calc(var(--page-w) * 2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.book-spread {
+  position: relative;
+  display: flex;
+  cursor: pointer;
+  transition: transform 0.45s ease;
+}
+
+.book-page {
+  width: var(--page-w);
+  height: var(--page-h);
+  display: block;
+  background: #fff;
+  user-select: none;
+}
+
+.book-page[hidden] {
+  display: none;
+}
+
+/* Closed: tilted, with a few page edges showing. */
+.book[data-state="closed"] .book-spread {
+  transform: perspective(1000px) rotateY(-20deg);
+  box-shadow:
+    1px 1px 0 #d8d4ca,
+    2px 2px 0 #c9c4b8,
+    3px 3px 0 #bab4a7,
+    4px 4px 0 #aaa396,
+    10px 14px 28px rgba(0, 0, 0, 0.6);
+}
+
+.book[data-state="closed"] .book-spread:hover {
+  transform: perspective(1000px) rotateY(-8deg);
+}
+
+/* Open: a soft shadow down the fold. */
+.book[data-state="open"] .book-spread::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 48px;
+  transform: translateX(-50%);
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.22) 50%, transparent);
+  pointer-events: none;
+}
+
+.book-caption {
+  min-height: 1.4em;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--ink-50);
+  text-align: center;
 }
 
 /* ── About page ───────────────────────────────────────────────── */
@@ -644,6 +703,27 @@ button {
   max-width: 700px;
 }
 
+.play-tabs {
+  display: flex;
+  gap: 14px;
+}
+
+.play-tab {
+  background: none;
+  border: none;
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--link);
+  text-decoration: underline;
+  padding: 4px 0 6px;
+}
+
+/* The selected tab is plain text, like a link to the page you're on. */
+.play-tab.is-active {
+  color: var(--ink);
+  text-decoration: none;
+}
+
 .play-list {
   width: 100%;
   max-width: 700px;
@@ -779,6 +859,10 @@ button {
     animation: none;
   }
   body {
+    transition: none;
+  }
+  .book-spread,
+  .tv-screen {
     transition: none;
   }
 }

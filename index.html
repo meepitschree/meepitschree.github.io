@@ -52,47 +52,37 @@
       <section class="page page-art" data-page="art" hidden>
         <div class="art-header">
           <a href="#/" class="page-back">back</a>
-          <p>some art picks for your viewing! (UNDER CONSTRUCTION)</p>
-          <nav class="art-tabs">
-            <button class="art-tab is-active" data-filter="all">all</button>
-            <button class="art-tab" data-filter="zines">zines</button>
-            <button class="art-tab" data-filter="digital">digital</button>
-          </nav>
         </div>
-        <div class="art-grid" id="art-grid">
-          <!--
-            To add a piece:
-              <div class="art-item" data-category="zines">
-                <div class="art-thumb">
-                  <img src="./src/assets/your-image.jpg" alt="title" />
+        <div class="art-body">
+          <div class="art-stage">
+            <div class="tv-wrap" role="region" aria-label="TV playing my video work">
+              <div class="tv" title="click to change the channel">
+                <pre class="tv-pre" aria-hidden="true"></pre>
+                <div class="tv-screen">
+                  <div class="tv-media"></div>
+                  <div class="tv-osd tv-osd--channel" hidden></div>
+                  <div class="tv-osd tv-osd--paused" hidden>|| PAUSE</div>
                 </div>
-                <p class="art-title">title</p>
-                <p class="art-meta">year</p>
               </div>
-
-            Categories: "zines" | "digital" — add more tabs + categories freely.
-          -->
-          <div class="art-item" data-category="zines" data-pages='["./src/assets/zine_camera/Camera_Zine_0.PNG","./src/assets/zine_camera/Camera_Zine_1.PNG","./src/assets/zine_camera/Camera_Zine_2.PNG","./src/assets/zine_camera/Camera_Zine_3.PNG","./src/assets/zine_camera/Camera_Zine_4.PNG","./src/assets/zine_camera/Camera_Zine_5.PNG","./src/assets/zine_camera/Camera_Zine_6.PNG","./src/assets/zine_camera/Camera_Zine_7.PNG"]'>
-            <div class="art-thumb">
-              <img src="./src/assets/thumb_zine_camera.png" alt="XT's First Camera! (& Zine!)" />
+              <div class="tv-controls">
+                <button class="tv-button tv-prev" type="button">&lt;&lt; ch</button>
+                <button class="tv-button tv-pause" type="button">pause</button>
+                <button class="tv-button tv-next" type="button">ch &gt;&gt;</button>
+              </div>
+              <p class="tv-caption visually-hidden" aria-live="polite"></p>
             </div>
-            <p class="art-title">XT's First Camera! (& Zine!)</p>
-            <p class="art-meta">2026</p>
+            <!-- Channels are listed in src/scripts/channels.js -->
+            <nav class="channels" aria-label="channels">
+              <p class="channels-label">channels</p>
+              <ol class="channel-list"></ol>
+            </nav>
           </div>
-          <div class="art-item" data-category="zines">
-            <div class="art-thumb"><span class="art-placeholder">✿︎</span></div>
-            <p class="art-title">zine title</p>
-            <p class="art-meta">2024</p>
-          </div>
-          <div class="art-item" data-category="digital">
-            <div class="art-thumb"><span class="art-placeholder">❁︎</span></div>
-            <p class="art-title">digital piece</p>
-            <p class="art-meta">2025</p>
-          </div>
-          <div class="art-item" data-category="digital">
-            <div class="art-thumb"><span class="art-placeholder">❀︎</span></div>
-            <p class="art-title">digital piece</p>
-            <p class="art-meta">2024</p>
+          <div class="book" data-state="closed" role="region" aria-label="zine">
+            <div class="book-spread">
+              <img class="book-page book-left" alt="" />
+              <img class="book-page book-right" alt="" hidden />
+            </div>
+            <p class="book-caption"></p>
           </div>
         </div>
       </section>
@@ -174,23 +164,6 @@
       </section>
 
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">dark</button>
-
-      <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
-        <button class="lightbox-close" id="lightbox-close">close</button>
-        <div class="lightbox-content">
-          <div class="lightbox-spread" id="lightbox-spread">
-            <img class="lightbox-page" id="lightbox-page-a" src="" alt="" />
-            <img class="lightbox-page" id="lightbox-page-b" src="" alt="" hidden />
-          </div>
-          <div class="lightbox-zone lightbox-zone--prev" id="lz-prev">
-            <span class="lightbox-arrow">&lt;&lt;</span>
-          </div>
-          <div class="lightbox-zone lightbox-zone--next" id="lz-next">
-            <span class="lightbox-arrow">&gt;&gt;</span>
-          </div>
-        </div>
-        <span class="lightbox-counter" id="lightbox-counter"></span>
-      </div>
     </main>
 
     <script type="module" src="./src/scripts/main.js"></script>
