@@ -14,27 +14,27 @@ export const CHANNELS = [
     year: "",
     src: "./src/assets/videos/tv/td_flowergrid.mp4",
     fit: "contain", // widescreen: black bars top and bottom
-    desc: "(description to come)",
+    desc: "i like flowers",
   },
   {
     title: "td_mediapipe", // placeholder: filename for now
     year: "",
     src: "./src/assets/videos/tv/td_mediapipe.mp4",
     fit: "cover",
-    desc: "(description to come)",
+    desc: "trendy filter",
   },
   {
     title: "td_dance", // placeholder: filename for now
     year: "",
     src: "./src/assets/videos/tv/td_dance.mp4",
     fit: "contain", // vertical video: black bars on the sides
-    desc: "(description to come)",
+    desc: "wiggles",
   },
   {
     title: "td_metropolis", // placeholder: filename for now
     year: "",
     src: "./src/assets/videos/tv/td_metropolis.mp4",
     fit: "contain", // widescreen: black bars top and bottom
-    desc: "(description to come)",
+    desc: "diagonals",
   },
 ];
