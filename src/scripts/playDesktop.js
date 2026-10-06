@@ -73,6 +73,18 @@ const STEAM_MS = 500;
 
 const coffeeFrame = (i) => [...STEAM[i], ...MUG].join("\n");
 
+// Does the image fill its whole square (no transparent corners)? Those get
+// drawn as a rounded, bevelled tile, like an app icon, so they sit well
+// next to the cut-out ones.
+function isOpaque(img) {
+  const size = 16;
+  const ctx = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+  ctx.canvas.width = ctx.canvas.height = size;
+  ctx.drawImage(img, 0, 0, size, size);
+  const alphaAt = (x, y) => ctx.getImageData(x, y, 1, 1).data[3];
+  return [alphaAt(0, 0), alphaAt(size - 1, 0), alphaAt(0, size - 1), alphaAt(size - 1, size - 1)].every((a) => a > 250);
+}
+
 const formatTime = () =>
   new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }).toLowerCase();
 
@@ -112,17 +124,21 @@ export function createPlayDesktop({ rootEl, projects }) {
     button.className = "pc-icon";
     button.setAttribute("aria-label", `open ${project.title}`);
 
+    const art = document.createElement("span");
+    art.className = "pc-icon-art";
     const img = document.createElement("img");
     img.className = "pc-icon-img";
-    img.src = project.thumb;
     img.alt = "";
     img.loading = "lazy"; // waits until the play page is opened
+    img.addEventListener("load", () => art.classList.toggle("is-tile", isOpaque(img)), { once: true });
+    img.src = project.thumb;
+    art.append(img);
 
     const label = document.createElement("span");
     label.className = "pc-icon-label";
     label.textContent = project.file;
 
-    button.append(img, label);
+    button.append(art, label);
     button.addEventListener("click", () => open(i, button));
     item.append(button);
     return item;

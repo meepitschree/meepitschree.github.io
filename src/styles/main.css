@@ -829,10 +829,47 @@ button {
   outline-offset: 3px;
 }
 
-.pc-icon-img {
+.pc-icon-art {
+  position: relative;
+  display: block;
   width: 4.6em;
   height: 4.6em;
+}
+
+.pc-icon-img {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+}
+
+/* Full-bleed thumbnails (no transparency, see isOpaque() in playDesktop.js)
+   become a rounded, bevelled tile, like a Mac app icon — a little smaller
+   than the box, so they weigh the same as the cut-out ones. */
+.pc-icon-art.is-tile {
+  width: 4em;
+  height: 4em;
+  margin: 0.3em;
+  border-radius: 22.5%;
+  box-shadow: 0 0.12em 0.35em rgba(0, 0, 0, 0.3);
+}
+
+.pc-icon-art.is-tile .pc-icon-img {
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* The bevel: a light top edge and a darker bottom edge. */
+.pc-icon-art.is-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0.08em 0 rgba(255, 255, 255, 0.55),
+    inset 0 -0.08em 0 rgba(0, 0, 0, 0.25),
+    inset 0 0 0 0.03em rgba(255, 255, 255, 0.2);
+  pointer-events: none;
 }
 
 .pc-icon-label {
