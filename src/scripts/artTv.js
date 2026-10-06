@@ -8,6 +8,7 @@
  * Nothing loads or runs until the page is shown: the first video downloads
  * on the first show(), and hide() stops the drawing and pauses the video.
  */
+import { fitInsideAsciiScreen } from "./asciiScreen.js";
 
 const COLS = 52; // screen size, in characters
 const ROWS = 24;
@@ -243,42 +244,18 @@ export function createArtTv({ rootEl, channels }) {
     osd.hidden = now >= osdUntil;
   }
 
-  // How far down its line a "_" is drawn, measured from the font. The
-  // screen's top and bottom edges are rows of "_", which sit near the
-  // bottom of their line — not where the line's box is.
-  function underscoreY(lh) {
-    const style = getComputedStyle(pre);
-    const ctx = document.createElement("canvas").getContext("2d");
-    ctx.font = `${style.fontSize} ${style.fontFamily}`;
-    const m = ctx.measureText("_");
-    if (m.fontBoundingBoxAscent === undefined) return lh * 0.9; // older browsers
-    // line-height is 1, so the font's ascent + descent is centred in the line.
-    const baseline = (lh - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent;
-    return baseline + (m.actualBoundingBoxDescent - m.actualBoundingBoxAscent) / 2;
-  }
-
-  // Fit the picture inside the ASCII screen with an even gap all round.
-  function measure() {
-    const rect = pre.getBoundingClientRect();
-    if (!rect.width) return; // hidden
-    const cw = rect.width / FRAME_W;
-    const lh = rect.height / FRAME_LINES;
-    const lineY = underscoreY(lh);
-
-    // The screen's edges: the middle of each "|", and each row of "_".
-    const left = (SCREEN_COL0 - 0.5) * cw;
-    const right = (SCREEN_COL0 + COLS + 0.5) * cw;
-    const top = (SCREEN_ROW0 - 1) * lh + lineY;
-    const bottom = (SCREEN_ROW0 + ROWS) * lh + lineY;
-    const gap = cw / 2;
-
-    Object.assign(screen.style, {
-      left: `${left + gap}px`,
-      top: `${top + gap}px`,
-      width: `${right - left - 2 * gap}px`,
-      height: `${bottom - top - 2 * gap}px`,
+  // Fit the video inside the ASCII screen (see asciiScreen.js).
+  const measure = () =>
+    fitInsideAsciiScreen({
+      pre,
+      overlay: screen,
+      frameCols: FRAME_W,
+      frameLines: FRAME_LINES,
+      col0: SCREEN_COL0,
+      row0: SCREEN_ROW0,
+      cols: COLS,
+      rows: ROWS,
     });
-  }
 
   // ── Input ──
   tv.addEventListener("click", () => tune(current + 1));

@@ -32,6 +32,7 @@ export function createAsciiBloom({ container, element, cursorState }) {
   let targetScene = "bloom";
   let transitionProgress = 1;
   let transitionStart = 0;
+  let pendingScene = null; // a scene requested mid-fade (see setScene)
   let onSettleCallback = null;
 
   function measureCharSize() {
@@ -89,7 +90,15 @@ export function createAsciiBloom({ container, element, cursorState }) {
       transitionProgress = Math.min(1, (t - transitionStart) / SCENE_TRANSITION);
       if (transitionProgress >= 1) {
         scene = targetScene;
-        if (onSettleCallback) onSettleCallback(scene);
+        if (pendingScene) {
+          // You navigated again mid-fade: fade on to where you are now
+          // (and skip "settled" for the scene you've already left).
+          const next = pendingScene;
+          pendingScene = null;
+          setScene(next);
+        } else if (onSettleCallback) {
+          onSettleCallback(scene);
+        }
       }
     }
 
@@ -106,11 +115,14 @@ export function createAsciiBloom({ container, element, cursorState }) {
     );
   }
 
-  // Trigger a crossfade to a new scene. No-op if already transitioning or
-  // already at that scene.
+  // Trigger a crossfade to a new scene. Mid-fade, the request waits and
+  // runs as soon as the current fade finishes (the latest request wins).
   function setScene(name) {
-    if (name === targetScene && transitionProgress >= 1) return;
-    if (transitionProgress < 1) return; // ignore mid-transition for simplicity
+    if (transitionProgress < 1) {
+      pendingScene = name;
+      return;
+    }
+    if (name === targetScene) return;
     scene = targetScene;
     targetScene = name;
     transitionProgress = 0;

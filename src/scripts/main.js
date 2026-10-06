@@ -65,6 +65,7 @@ function showPage(name) {
 function applyRoute() {
   const route = currentRoute();
   if (route !== "art") artPage.hide(); // pauses the TV when you leave
+  if (route !== "play") playPage.hide(); // stops the desktop clock
   if (route === "about") {
     showPage("about");
     bloom.setScene("hill");
@@ -75,6 +76,7 @@ function applyRoute() {
     bloom.setScene("art");
   } else if (route === "play") {
     showPage("play");
+    playPage.show();
     hillFlowers.despawn();
     bloom.setScene("art"); // blank background — add a play scene later if wanted
   } else {
