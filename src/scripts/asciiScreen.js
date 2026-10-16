@@ -53,3 +53,20 @@ export function fitInsideAsciiScreen({ pre, overlay, frameCols, frameLines, col0
     height: `${bottom - top - 2 * gap}px`,
   });
 }
+
+/**
+ * Position `el` over a block of characters in the drawing: `cells` is
+ * [col, row, cols, rows], fractions allowed. Does nothing while hidden.
+ */
+export function coverAsciiCells({ pre, el, frameCols, frameLines, cells: [col, row, cols, rows] }) {
+  const rect = pre.getBoundingClientRect();
+  if (!rect.width) return;
+  const cw = rect.width / frameCols;
+  const lh = rect.height / frameLines;
+  Object.assign(el.style, {
+    left: `${col * cw}px`,
+    top: `${row * lh}px`,
+    width: `${cols * cw}px`,
+    height: `${rows * lh}px`,
+  });
+}

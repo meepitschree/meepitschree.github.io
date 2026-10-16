@@ -45,8 +45,10 @@
 
       <section class="page page-about" data-page="about" hidden>
         <div class="about-content">
-          <p>i'm figuring out what to write here still.</p>
-          <p>xoxo.</p>
+          <p>for what, but to create, experience, and share?</p>
+          <p>i'm delighted we're here. :)</p>
+          <br/>
+          <p>xt</p>
           <a href="#/" class="page-back">back</a>
         </div>
       </section>
@@ -84,7 +86,7 @@
               <img class="book-page book-left" alt="" />
               <img class="book-page book-right" alt="" hidden />
             </div>
-            <p class="book-caption"></p>
+            <button class="book-expand" type="button" aria-label="read the zine larger" aria-expanded="false">⤢</button>
           </div>
         </div>
       </section>
@@ -102,22 +104,24 @@
             <div class="pc">
               <pre class="pc-pre" aria-hidden="true"></pre>
               <div class="pc-screen">
-                <!-- Projects are listed in src/scripts/projects.js -->
-                <ul class="pc-icons" aria-label="projects"></ul>
-                <!-- Windows open here, between the icons and the taskbar. -->
-                <div class="pc-stage">
-                  <div class="pc-window" role="dialog" aria-labelledby="pc-window-title" hidden>
-                    <div class="pc-window-bar">
-                      <span class="pc-window-file"></span>
-                      <button class="pc-window-close" type="button" aria-label="close">x</button>
-                    </div>
-                    <div class="pc-window-body">
-                      <img class="pc-window-thumb" alt="" />
-                      <div>
-                        <h2 class="pc-window-title" id="pc-window-title"></h2>
-                        <p class="pc-window-meta"></p>
-                        <p class="pc-window-desc"></p>
-                        <a class="pc-window-link" target="_blank" rel="noopener noreferrer"></a>
+                <!-- The desktop: icons, with windows opening below them (the icons
+                     scroll if there are lots). Projects are listed in src/scripts/projects.js -->
+                <div class="pc-desktop">
+                  <ul class="pc-icons" aria-label="projects"></ul>
+                  <div class="pc-stage">
+                    <div class="pc-window" role="dialog" aria-labelledby="pc-window-title" hidden>
+                      <div class="pc-window-bar">
+                        <span class="pc-window-file"></span>
+                        <button class="pc-window-close" type="button" aria-label="close">x</button>
+                      </div>
+                      <div class="pc-window-body">
+                        <img class="pc-window-thumb" alt="" />
+                        <div>
+                          <h2 class="pc-window-title" id="pc-window-title"></h2>
+                          <p class="pc-window-meta"></p>
+                          <p class="pc-window-desc"></p>
+                          <a class="pc-window-link" target="_blank" rel="noopener noreferrer"></a>
+                        </div>
                       </div>
                     </div>
                   </div>

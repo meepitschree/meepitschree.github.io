@@ -24,6 +24,7 @@ export function createArtPage({ pageEl }) {
     },
     hide() {
       tv.hide();
+      zine.hide();
     },
   };
 }

@@ -4,9 +4,18 @@
  *   file   the icon's filename label (e.g. "game.exe", "site.html")
  *   thumb  the icon image — cut-out / transparent PNGs look best
  *   tag    shown next to the year in the window (e.g. "game", "interactive")
- *   link   { label, href }, shown as [label ↗] in the window
+ *   link   { label, href }, shown as [label ->] in the window
  */
 export const PROJECTS = [
+  {
+    title: "downstraim",
+    file: "downstraim.exe",
+    year: 2026,
+    tag: "game",
+    thumb: "./src/assets/thumb_downstraim.png",
+    desc: "a vector math puzzle game for the GMTK Game Jam 2026! Drag straight lines to merge fish into one school and get them swimming straight down. Playable in browser. :)",
+    link: { label: "play", href: "https://chreehouse.itch.io/downstraim" },
+  },
   {
     title: "memoriesOS",
     file: "memoriesOS.exe",

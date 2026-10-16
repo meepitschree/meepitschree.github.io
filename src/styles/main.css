@@ -243,7 +243,8 @@ button {
 .tv-button:active,
 .channel-link:active,
 .pc-window-close:active,
-.pc-window-link:active {
+.pc-window-link:active,
+.book-expand:active {
   color: #ee0000;
 }
 
@@ -516,32 +517,88 @@ button {
     2px 2px 0 #c9c4b8,
     3px 3px 0 #bab4a7,
     4px 4px 0 #aaa396,
-    10px 14px 28px rgba(0, 0, 0, 0.6);
+    6px 10px 24px rgba(0, 0, 0, 0.3);
 }
 
 .book[data-state="closed"] .book-spread:hover {
   transform: perspective(1000px) rotateY(-8deg);
 }
 
-/* Open: a soft shadow down the fold. */
-.book[data-state="open"] .book-spread::after {
+/* Open to a two-page spread: a soft shadow down the fold. (Not on the
+   back cover, which is a single page.) */
+.book-spread:has(.book-right:not([hidden]))::after {
   content: "";
   position: absolute;
   top: 0;
   bottom: 0;
   left: 50%;
-  width: 48px;
+  width: 32px;
   transform: translateX(-50%);
-  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.22) 50%, transparent);
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.1) 50%, transparent);
   pointer-events: none;
 }
 
-.book-caption {
-  min-height: 1.4em;
-  font-family: var(--font-mono);
-  font-size: 14px;
-  color: var(--ink-50);
-  text-align: center;
+/* One page at a time (phones): half of that shadow, along the edge where
+   the page meets the spine — the right edge of a left-hand page, the left
+   edge of a right-hand one. */
+.book[data-side] .book-spread::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  pointer-events: none;
+}
+
+.book[data-side="left"] .book-spread::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.1), transparent);
+}
+
+.book[data-side="right"] .book-spread::after {
+  left: 0;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.1), transparent);
+}
+
+/* ⤢ under the zine: opens it filling the screen (and becomes x). */
+.book-expand {
+  padding: 6px 8px;
+  margin: -6px -8px; /* a bigger click area, without moving anything */
+  border: 0;
+  background: none;
+  font-family: "Space Mono", ui-monospace, "Apple Symbols", "Segoe UI Symbol", monospace;
+  font-size: 17px;
+  line-height: 1;
+  color: var(--ink);
+}
+
+/* Expanded: the zine over the whole screen, as big as an open spread
+   fits (pages turn the same way). */
+.book.is-expanded {
+  --page-h: min(calc(100dvh - 120px), calc((100vw - 2 * var(--pad-x)) / 2 * 1275 / 825));
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  width: auto;
+  justify-content: center;
+  background: var(--bg);
+}
+
+/* …and the art page behind it holds still. */
+.page-art:has(.book.is-expanded) {
+  overflow: hidden;
+}
+
+/* Phones: one page at a time (see zineBooklet.js), as big as fits. */
+@media (max-width: 760px) {
+  .book {
+    --page-h: min(60vh, calc((100vw - 2 * var(--pad-x)) * 1275 / 825));
+    width: var(--page-w);
+  }
+
+  .book.is-expanded {
+    --page-h: min(calc(100dvh - 120px), calc((100vw - 2 * var(--pad-x)) * 1275 / 825));
+  }
 }
 
 /* ── About page ───────────────────────────────────────────────── */
@@ -786,16 +843,74 @@ button {
   }
 }
 
-/* Small screens: just the computer for now (the desk items come back in a
-   later mobile pass). */
+/* Phones: no desk, and a handheld game console instead of the computer
+   (drawn by playDesktop.js, which also sets --scene-chars to fit it). */
 @media (max-width: 760px) {
-  .pc-scene {
-    --scene-chars: 94;
-  }
   .pc-plant,
   .pc-coffee {
     display: none;
   }
+}
+
+/* On the handheld the icons fill the desktop, centred, and a window covers
+   them all, like an app. */
+.pc-scene[data-layout="handheld"] .pc-icons {
+  flex: 1;
+  justify-content: center;
+}
+
+.pc-scene[data-layout="handheld"] .pc-stage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pc-scene[data-layout="handheld"] .pc-window {
+  pointer-events: auto;
+  inset: 0.8em;
+  transform: none;
+  width: auto;
+  max-height: none;
+}
+
+.pc-scene[data-layout="handheld"] .pc-window-body {
+  grid-template-columns: 1fr;
+}
+
+/* The handheld's buttons: invisible, laid over the drawn d-pad and A/B,
+   and the drawn button flashes inverted while you press it. */
+.pc-pad {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  background: none;
+  touch-action: manipulation; /* no double-tap zoom when pressing quickly */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* A bigger area to tap than the drawing, so they're easy to hit. */
+.pc-pad::before {
+  content: "";
+  position: absolute;
+  inset: -0.7em;
+}
+
+.pc-pad--a,
+.pc-pad--b {
+  border-radius: 50%;
+}
+
+.pc-pad[hidden] {
+  display: none;
+}
+
+.pc-pad:focus {
+  outline: none;
+}
+
+.pc-pad.is-pressed {
+  -webkit-backdrop-filter: invert(1);
+  backdrop-filter: invert(1);
 }
 
 /* The desktop, laid over the ASCII screen. Solid, so the page's ASCII
@@ -808,9 +923,24 @@ button {
   background: var(--bg);
 }
 
+/* The desktop: everything above the taskbar — icons, then the space
+   where windows open. */
+.pc-desktop {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 /* ── Icons: real thumbnail + filename ── */
+/* If there are more than fit above the window space, they scroll. */
 .pc-icons {
-  flex: none;
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-50) transparent;
   list-style: none;
   display: flex;
   flex-wrap: wrap;
@@ -892,11 +1022,10 @@ button {
 }
 
 /* ── Window ── */
-/* The space between the icons and the taskbar, so a window never covers
-   the icons. */
+/* The space between the icons and the taskbar, where windows open — never
+   less than this tall, however many icons there are (they scroll instead). */
 .pc-stage {
-  flex: 1;
-  min-height: 0;
+  flex: 1 0 13.5em;
   position: relative;
 }
 
